@@ -1,0 +1,40 @@
+export default {
+    id: 2,
+    navName: '正特',
+    subNav: [
+        {id: 1, name: '正特1'},
+        {id: 2, name: '正特2'},
+        {id: 3, name: '正特3'},
+        {id: 4, name: '正特4'},
+        {id: 5, name: '正特5'},
+        {id: 6, name: '正特6'},
+    ],
+    balls: {
+        title: '正特',
+        data: [
+            {id: 1, name: '01', color: '#1B8651', peilv: 3.0},
+            {id: 2, name: '02', color: '#1B8651', peilv: 1.0},
+            {id: 3, name: '03', color: '#B12838', peilv: 2.0},
+            {id: 4, name: '04', color: '#1B8651', peilv: 3.0},
+            {id: 5, name: '05', color: '#B12838', peilv: 4.0},
+            {id: 6, name: '06', color: '#156DCA', peilv: 5.0},
+            {id: 7, name: '07', color: '#B12838', peilv: 6.0},
+            {id: 8, name: '08', color: '#B12838', peilv: 7.0},
+            {id: 9, name: '09', color: '#156DCA', peilv: 8.0},
+        ],
+    },
+    rules: {
+        title: '正特-规则',
+        data: [
+            {id: 1, name: '红色', peilv: 1.8},
+            {id: 2, name: '绿色', peilv: 4.0},
+            {id: 3, name: '蓝色', peilv: 5.0},
+            {id: 4, name: '特大', peilv: 6.0},
+            {id: 5, name: '特小', peilv: 3.0},
+            {id: 6, name: '特单', peilv: 23.0},
+            {id: 7, name: '特双', peilv: 4.0},
+            {id: 8, name: '尾小', peilv: 5.0},
+            {id: 9, name: '和单', peilv: 6.0},
+        ],
+    },
+}

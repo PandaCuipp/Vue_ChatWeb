@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    <link rel="stylesheet" href="./css/11x5.css?v=1.0.1"/>
+    <script src="./js/jquery-1.7.2.min.js"></script>
+    <script src="./js/main.js?v=1.0.2"></script>
+</head>
+<body>
+<div id="videobox">
+    <div class="content container">
+        <div class="animate">
+            <div class="eleAnimate">
+                <div class="noinfor"></div>
+                <div class="bodybg"><img src="./images/flash.png"/></div>
+                <div class="animate_content">
+                    <div class="nameLogo"><img src="./images/11x5_default.png" alt=""/></div>
+                    <div class="codeArr">
+                        <ul>
+                            <li class="code6"></li>
+                            <li class="code7"></li>
+                            <li class="code8"></li>
+                            <li class="code9"></li>
+                            <li class="code10"></li>
+                            <li>
+                                <span>0</span>
+                                <span>-</span>
+                                <span>-</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="drawInfo">
+                        <div class="nextDraw">
+                            期号:<span id="drawIssue">0000</span>
+                        </div>
+                        <div id="spanbtn" class="soundsOn"></div>
+                    </div>
+                </div>
+                <div class="codeNum">
+                    <ul>
+                        <li class="num1"></li>
+                        <li class="num2"></li>
+                        <li class="num3"></li>
+                        <li class="num4"></li>
+                        <li class="num5"></li>
+                    </ul>
+                    <div id="hidNum">
+                        <span class="num1">1</span>
+                        <span class="num2">2</span>
+                        <span class="num3">3</span>
+                        <span class="num4">4</span>
+                        <span class="num5">5</span>
+                    </div>
+                </div>
+                <div class="manPic">
+                    <span class="manll"></span>
+                    <span class="manrl"></span>
+                </div>
+                <div class="cuttime">
+                    <!--<div id="hourtxt">19:36:00</div>-->
+                    <div id="opening">
+                        <!--正在开奖中-->
+                    </div>
+                </div>
+                <!--<span id="mnKai">模拟开奖按钮</span>-->
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    function convertTime(num) {
+        var shownum = String(num);
+        var countnum = shownum.length;
+        if (countnum == 1) {
+            shownum = "0" + shownum;
+            return shownum;
+        } else {
+            return shownum;
+        }
+
+    }
+
+    $(function () {
+        playSound('bg');
+    })
+
+    function initZoomHtml(W) {
+        const iContainer = $(".container")
+        const iframeWidth = iContainer.width();//1125
+        const H = W * iContainer.height() / iframeWidth;
+        // const zoomW = formatMoney(W / iframeWidth, 6);
+        const iFrameHeight = H + 10;
+        postMessageToTop('initHeight', iFrameHeight);
+    };
+
+    function runFunction({type, data}) {
+        const {functionName, args} = data;
+        if (type === 'runFunction' && typeof window.__animate[functionName]) {
+            window.__animate[functionName](...args);
+        }
+
+    }
+
+    function postMessageToTop(type, data) {
+        try {
+            const message = JSON.stringify({
+                type,
+                data,
+            });
+            window.postMessage(message);
+        } catch (e) {
+
+        }
+
+    }
+
+    function playSound(key) {
+        postMessageToTop('playSound', key);
+        const Sounds = window.top.fiveSounds;
+        if (!Sounds) {
+            return;
+        }
+        if (localStorage.getItem('___notAudio') === 'true') {
+            return;
+        }
+        if (Sounds[key] && typeof Sounds[key].play === 'function') {
+            Sounds[key].play();
+        }
+    }
+
+    function pauseSound(key) {
+        postMessageToTop('pauseSound', key);
+        const Sounds = window.top.fiveSounds;
+        if (!Sounds) {
+            return;
+        }
+        if (localStorage.getItem('___notAudio') === 'true') {
+            return;
+        }
+        if (Sounds[key] && typeof Sounds[key].pause === 'function') {
+            Sounds[key].pause();
+        }
+    }
+
+    function pauseAllSound() {
+        postMessageToTop('pauseAllSound');
+        const Sounds = window.top.fiveSounds;
+        if (!Sounds) {
+            return;
+        }
+        for (let audio of Object.values(Sounds)) {
+            if (audio && typeof audio.pause === 'function') {
+                audio.pause();
+            }
+        }
+    }
+
+    window.__animate = {
+        // 执行动画
+        startGame: k3v.startGame,
+        // 开奖
+        stopGame(qihao, haoma, callback, isInit = false) {
+            // 期号
+            if (qihao && qihao.length > 4) {
+                qihao = qihao.substr(-4, 4);
+            }
+            $("#drawIssue").text(qihao || '0000');
+            // 总和处理
+            if (haoma) {
+                if (typeof haoma === 'string') {
+                    haoma = haoma.split(',');
+                }
+                $(haoma).each(function (n) {
+                    $(".codeArr").find("li").eq(n).removeClass().addClass("code" + this)
+                });
+                if (haoma.length) {
+                    let sum = haoma.reduce((a, b) => {
+                        return Number(a) + Number(b);
+                    }, 0);
+                    let dx = sum >= 22;
+                    let ds = sum % 2 === 0;
+                    let res = {
+                        name: '总和：',
+                        value: sum,
+                        dx: dx ? '大' : '小',
+                        dxColor: dx ? '#FDCC44' : '#0089FF',
+                        ds: ds ? '双' : '单',
+                        dsColor: ds ? '#FDCC44' : '#0089FF',
+                    }
+
+                    // 总和
+                    const lhSpan = $(".codeArr").find("li").eq(5).find("span");
+                    lhSpan.eq(0).text(res.value);
+                    lhSpan.eq(1).text(res.dx);
+                    lhSpan.eq(1).css({color: res.dxColor});
+                    lhSpan.eq(2).text(res.ds);
+                    lhSpan.eq(2).css({color: res.dsColor});
+                }
+                k3v.stopVideo({preDrawCode: haoma}, callback, isInit);
+            }
+        },
+        setCountDown(sec, prefix = '', otherText) {
+            if (otherText) {
+                $("#opening").html(otherText);
+                return;
+            }
+            let minute = sec / 60;
+            minute = Math.floor(minute);
+            if (minute == 0) {
+                var showminute = "00";
+            } else {
+                var showminute = String(minute);
+                showminute = convertTime(showminute);
+            }
+
+            let second = sec - (minute * 60);
+            let showsec = convertTime(second);
+
+            if (sec < 0) {
+                $("#opening").html(prefix + " 00:00");
+            } else {
+                $("#opening").html(`${prefix} ${showminute}:${showsec}`);
+            }
+
+        },
+        postMessageToTop,
+        initZoomHtml,
+    }
+
+</script>
+
+</body>
+
+</html>
